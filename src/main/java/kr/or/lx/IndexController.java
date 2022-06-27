@@ -10,7 +10,7 @@ public class IndexController {
     @GetMapping("/")
     public String index() {
         
-        return "index";
+        return "server/receive/list";
     }
     
     @GetMapping("/posts/save")
