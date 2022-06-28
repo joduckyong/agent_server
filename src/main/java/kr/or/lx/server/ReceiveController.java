@@ -22,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 @Controller
 public class ReceiveController {
 	
-	@Value("${agent.api.url}")
+	@Value("${agent.server.api.url}")
     private String agentApiUrl;    
 	
     @Autowired
