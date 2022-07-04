@@ -41,6 +41,13 @@ public class TransmissionController {
 		
 		return "server/transmission/reception";
 	}
+	
+	@GetMapping("/mapping")
+	public String mapping(ModelMap model) throws Exception{
+		log.info("mapping");
+		
+		return "server/transmission/mapping";
+	}
 
 	@ResponseBody
 	@PostMapping("{apiId}")

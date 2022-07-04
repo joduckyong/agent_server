@@ -10,17 +10,6 @@ public class IndexController {
     @GetMapping("/")
     public String index() {
         
-        return "index";
+        return "server/transmission/send";
     }
-    
-    @GetMapping("/posts/save")
-    public String postsSave() {
-        return "posts-save";
-    }    
-    
-    @DeleteMapping("/api/v1/posts/{id}")
-    public Long delete(@PathVariable Long id) {
-//        postService.delete(id);
-        return id;
-    }    
 }
