@@ -39,6 +39,20 @@ public class ReceiveController {
      * 데이터 수신 관리 API
      * @return
      */		
+	@GetMapping("/reception")
+	public String receptionDataList(ModelMap model) throws Exception{
+		log.info("receptionDataList");
+		
+		return "server/transmission/reception";
+	}
+	
+	@GetMapping("/mapping")
+	public String mapping(ModelMap model) throws Exception{
+		log.info("mapping");
+		
+		return "server/mapping/list";
+	}
+
 	@ResponseBody
 	@PostMapping("{apiId}")
 	public Object receivePost(@RequestBody Map<String, Object> param, ModelMap model) throws Exception{
