@@ -17,10 +17,10 @@ import kr.or.lx.common.ApiService;
 import lombok.extern.slf4j.Slf4j;
 
 
-@RequestMapping("server/receive")
+@RequestMapping("server/mapping")
 @Slf4j
 @Controller
-public class ReceiveController {
+public class MappingController {
 	
 	@Value("${agent.server.api.url}")
     private String agentApiUrl;    
@@ -29,12 +29,12 @@ public class ReceiveController {
 	private ApiService<?> apiService;
 	
 	@GetMapping("/list")
-	public String receiveList(ModelMap model) throws Exception{
-		log.info("receiveList");
+	public String mapping(ModelMap model) throws Exception{
+		log.info("mapping");
 		
-		return "server/receive/list";
+		return "server/mapping/list";
 	}
-	
+
 	@ResponseBody
 	@PostMapping("{apiId}")
 	public Object receivePost(@RequestBody Map<String, Object> param, ModelMap model) throws Exception{
