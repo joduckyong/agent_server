@@ -41,7 +41,7 @@
 							<div class="form-group row">
 								<label class="control-label">수집 테이블 목록</label>
 								<div class="form-control_box duplicate_box">
-									<input class="form-control" type="text">
+									<input class="form-control" type="text" name="input_table_nm" id="input_table_nm">
 									<button class="btn btn-primary" onclick="agentRecvLocalTable();">
 										<i class="glyphicon glyphicon-search"></i>
 									</button>
@@ -95,10 +95,10 @@
 						</div>
 
 						<div class="col-2 col-lg-1 d-flex align-self-center justify-content-center p-0">
-							<button class="btn btn-secondary" type="button">
+							<button class="btn btn-secondary" type="button" onclick="leftSetBtn();">
 								<i class="glyphicon glyphicon-chevron-left"></i>
 							</button>
-							<button class="btn btn-secondary" type="button">
+							<button class="btn btn-secondary" type="button" onclick="rightSetBtn();">
 								<i class="glyphicon glyphicon-chevron-right"></i>
 							</button>
 						</div>
@@ -143,6 +143,8 @@
 					<input type="hidden" name="table_nm" id="table_nm">
 					<input type="hidden" name="clct_csv_file" id=clct_csv_file>
 					<input type="hidden" name="trf_zip_file" id="trf_zip_file">
+					<input type="hidden" name="leftVal" id="leftVal">
+					<input type="hidden" name="rightVal" id="rightVal">
 
 				</div>
 			</div>
@@ -156,6 +158,8 @@
 <script>
 const url = '/server/mapping';
 
+let dataList;
+
 //데이터 수집 관리 
 const jsList = function(){
 	location.href = url+'/list';
@@ -164,8 +168,17 @@ const jsList = function(){
 //데이터 저장
 const agentRecvData = function(){
 	
-	let table_col_nm;
-	let file_col_nm;
+	let file_col_nm = [];
+	let table_col_nm = [];
+	if (dataList != null) {
+  	    $.each(dataList, function (idx, el) {
+  	    	if($("#"+el.column_name).text() != ''){
+	  	    	file_col_nm.push($("#"+el.column_name).text());
+	  	    	table_col_nm.push(el.column_name);
+  	    	}
+  	    });
+	}
+	
 	const data = {
 	   		url: '/recv/data',
 	   		user_id: 'user00',
@@ -186,8 +199,8 @@ const agentRecvData = function(){
 	    	
       		let message = JSON.stringify(data.message);
       		alert(message.replace(/\"/gi, ''));            	 
-      		jsList();
-		  	
+      		dataList = null;
+      		
 	    }).fail(function (error) {
 	        alert(JSON.stringify(error));
 	    });	
@@ -213,11 +226,12 @@ const agentRecvLocalCol = function(table_nm){
     }).done(function (data) {
     	
 	  	  if (data != null) {
+  	    	dataList = data;
  	    	
  	    	let insertTr = '';
 	  	    $.each(data, function (idx, el) {
 				insertTr += '<tr>';
-				insertTr += '	<td style="text-align: center;"></td>';
+				insertTr += '	<td style="text-align: center;cursor:pointer;" onclick=rightSet("'+isEmpty(el.column_name)+'")><span id="'+el.column_name+'"></span></td>';
 				insertTr += '	<td style="text-align: center;">'+isEmpty(el.column_name)+'</td>';
 				insertTr += '	<td style="text-align: center;">'+isEmpty(el.data_type)+'</td>';
 				insertTr += '	<td style="text-align: center;">'+isEmpty(el.character_maximum_length)+'</td>';
@@ -241,6 +255,7 @@ const agentRecvLocalTable = function(){
 	const data = {
    		url: '/recv/local/table',
    		user_id: 'user00',
+   		table_nm: $("#input_table_nm").val()
     };	
 	
     $.ajax({
@@ -269,21 +284,21 @@ const agentRecvLocalTable = function(){
     });		
 }
 
-const receiveCol = function(column_name, clct_csv_file, trf_zip_file){
+const receiveCol = function(column_names, clct_csv_file, trf_zip_file){
 	
 	$("#clct_csv_file").val(clct_csv_file);
 	$("#trf_zip_file").val(trf_zip_file);
 	
-	console.log('column_name: '+column_name);
-	
-	if(column_name != "[]"){
+	let column_name = $("#"+column_names).val().replace('[', "").replace(']', "");
+    var jbSplit = column_name.split(',');
+
+	if(column_name != ""){
 		let insertTr = '';
-	    $.each(column_name, function (idx, el) {
+		for (var i = 0; i <jbSplit.length;i++) {
 			insertTr += '<tr>';
-			insertTr += '	<td style="text-align: center;">'+isEmpty(el)+'</td>';
+			insertTr += '	<td style="text-align: left;cursor:pointer;" onclick=leftSet("'+isEmpty(jbSplit[i])+'");>'+isEmpty(jbSplit[i])+'</td>';
 			insertTr += '</tr>';
-	    });
-		  	    
+	    }
 	 	$("#receiveCol").html(insertTr);
 	}
  	
@@ -310,11 +325,12 @@ const agentRecvLocalCsvList = function(){
 	  	  if (data != null) {
  	    	
  	    	let insertTr = '';
+ 	    	let i = 0;
 	  	    $.each(data, function (idx, el) {
 				insertTr += '<tr>';
 				insertTr += '	<td style="text-align: center;">'+isEmpty(el.local_gov_nm)+'</td>';
 				insertTr += '	<td style="text-align: center;">'+el.recv_datetime+'</td>';
-				insertTr += '	<td style="text-align: center;cursor:pointer;" onclick=receiveCol("'+el.column_name+'","'+el.clct_csv_file+'","'+el.trf_zip_file+'");>'+el.clct_csv_file.substring(16)+'</td>';
+				insertTr += '	<td style="text-align: center;cursor:pointer;" onclick=receiveCol("column_name_'+(++i)+'","'+el.clct_csv_file+'","'+el.trf_zip_file+'");>'+el.clct_csv_file.substring(16)+'<input type=hidden name=column_name_'+(i)+' id=column_name_'+(i)+' value="'+el.column_name+'"></td>';
 				insertTr += '	<td style="text-align: center;">'+el.file_size+'</td>';
 				insertTr += '</tr>';
 	  	    });
@@ -326,6 +342,22 @@ const agentRecvLocalCsvList = function(){
     }).fail(function (error) {
         alert(JSON.stringify(error));
     });	
+}
+
+const leftSet = function(val){
+	$("#leftVal").val(val);
+}
+
+const rightSet = function(val){
+	$("#rightVal").val(val);
+}
+
+const leftSetBtn = function(){
+	$("#"+$("#rightVal").val()).text("");
+}
+
+const rightSetBtn = function(){
+	$("#"+$("#rightVal").val()).text($("#leftVal").val());
 }
 
 </script>
