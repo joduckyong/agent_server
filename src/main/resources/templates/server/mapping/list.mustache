@@ -289,18 +289,16 @@ const receiveCol = function(column_names, clct_csv_file, trf_zip_file){
 	$("#clct_csv_file").val(clct_csv_file);
 	$("#trf_zip_file").val(trf_zip_file);
 	
-	let column_name = $("#"+column_names).val().replace('[', "").replace(']', "");
+	let column_name = $("#"+column_names).val().replace('[', '').replace(']', '').replace(/ /g,"");
     var jbSplit = column_name.split(',');
 
-	if(column_name != ""){
-		let insertTr = '';
-		for (var i = 0; i <jbSplit.length;i++) {
-			insertTr += '<tr>';
-			insertTr += '	<td style="text-align: left;cursor:pointer;" onclick=leftSet("'+isEmpty(jbSplit[i])+'");>'+isEmpty(jbSplit[i])+'</td>';
-			insertTr += '</tr>';
-	    }
-	 	$("#receiveCol").html(insertTr);
-	}
+	let insertTr = '';
+	for (var i = 0; i <jbSplit.length;i++) {
+		insertTr += '<tr id="tr'+isEmpty(jbSplit[i])+'">';
+		insertTr += '	<td style="text-align: left;cursor:pointer;" onclick=leftSet("'+isEmpty(jbSplit[i])+'");><span id="'+isEmpty(jbSplit[i])+'">'+isEmpty(jbSplit[i])+'</span></td>';
+		insertTr += '</tr>';
+    }
+ 	$("#receiveCol").html(insertTr);
  	
 }
 
@@ -353,11 +351,24 @@ const rightSet = function(val){
 }
 
 const leftSetBtn = function(){
-	$("#"+$("#rightVal").val()).text("");
+ 	$("#tr"+$("#"+$("#rightVal").val()).text()).show();
+ 	$("#"+$("#rightVal").val()).text("");
+ 	
+ 	$("#leftVal").val("");
+ 	$("#rightVal").val("");
 }
 
 const rightSetBtn = function(){
+	
+	if($("#rightVal").val() == ""){
+		alert("컬럼 매핑 할곳을 선택해주세요!");
+		return;
+	}
 	$("#"+$("#rightVal").val()).text($("#leftVal").val());
+	$("#tr"+$("#leftVal").val()).hide();
+	
+	$("#leftVal").val("");
+	$("#rightVal").val("");
 }
 
 </script>
