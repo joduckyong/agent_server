@@ -1,5 +1,4 @@
 {{>layout/header}}
-
 <div class="right_col" role="main">
 	<div class="row">
 		<div class="col-md-12">
@@ -57,7 +56,7 @@
 													<th style="text-align: center;">테이블명</th>
 												</tr>
 											</thead>
-											<tbody id="agentRecvLocalTable">
+											<tbody id="agentRecvLocalTable" >
 											</tbody>
 										</table>
 									</div>
@@ -67,7 +66,7 @@
 					</div>
 					<br>
 					<div class="row">
-						<div class="metatable_box col-5">
+						<div class="metatable_box col-6">
 
 							<div class="row">
 								<div class="x_content">
@@ -84,26 +83,15 @@
 													<th style="text-align: center;">컬럼명</th>
 												</tr>
 											</thead>
-											<tbody id="receiveCol">
+											<tbody id="receiveCol" ondrop="drop(event)" ondragover="allowDrop(event)">
 											</tbody>
 										</table>
 									</div>
 								</div>
-
 							</div>
-
 						</div>
 
-						<div class="col-2 col-lg-1 d-flex align-self-center justify-content-center p-0">
-							<button class="btn btn-secondary" type="button" onclick="leftSetBtn();">
-								<i class="glyphicon glyphicon-chevron-left"></i>
-							</button>
-							<button class="btn btn-secondary" type="button" onclick="rightSetBtn();">
-								<i class="glyphicon glyphicon-chevron-right"></i>
-							</button>
-						</div>
-
-						<div class="metatable_box col-5 col-lg-6">
+						<div class="metatable_box col-6 col-lg-6">
 							<div class="row">
 
 								<h2>수집 테이블 컬럼 정보</h2>
@@ -143,8 +131,6 @@
 					<input type="hidden" name="table_nm" id="table_nm">
 					<input type="hidden" name="clct_csv_file" id=clct_csv_file>
 					<input type="hidden" name="trf_zip_file" id="trf_zip_file">
-					<input type="hidden" name="leftVal" id="leftVal">
-					<input type="hidden" name="rightVal" id="rightVal">
 
 				</div>
 			</div>
@@ -170,14 +156,32 @@ const agentRecvData = function(){
 	
 	let file_col_nm = [];
 	let table_col_nm = [];
+	let file_col_nm_len = [];
+	let null_yn_len = [];
+	
 	if (dataList != null) {
   	    $.each(dataList, function (idx, el) {
-  	    	if($("#"+el.column_name).text() != ''){
-	  	    	file_col_nm.push($("#"+el.column_name).text());
+  	    	if($("#drop_"+el.column_name).text() != ''){
+	  	    	file_col_nm.push($("#drop_"+el.column_name).text());
 	  	    	table_col_nm.push(el.column_name);
+	  	    	file_col_nm_len.push(idx);
+	//  	    	console.log('idx ==  '+idx);  	 
   	    	}
+  	    	if(el.is_nullable == "NO"){
+  	    		null_yn_len.push(idx);
+	//			console.log('idx: '+idx+', el.is_nullable: '+el.is_nullable);  	    	
+  	    	}  	    	
   	    });
 	}
+	
+	if (dataList != null) {
+		let values = null_yn_len.filter(x => !file_col_nm_len.includes(x));
+		if(values != ''){
+			alert("NULL여부 확인해 주세요!");
+			return;
+		}
+	}
+	
 	
 	const data = {
 	   		url: '/recv/data',
@@ -231,7 +235,7 @@ const agentRecvLocalCol = function(table_nm){
  	    	let insertTr = '';
 	  	    $.each(data, function (idx, el) {
 				insertTr += '<tr>';
-				insertTr += '	<td style="text-align: center;cursor:pointer;" onclick=rightSet("'+isEmpty(el.column_name)+'")><span id="'+el.column_name+'"></span></td>';
+				insertTr += '	<td style="text-align: center;cursor:pointer;" ondrop="drop(event)" ondragover="allowDrop(event)" id="drop_'+el.column_name+'"></td>';
 				insertTr += '	<td style="text-align: center;">'+isEmpty(el.column_name)+'</td>';
 				insertTr += '	<td style="text-align: center;">'+isEmpty(el.data_type)+'</td>';
 				insertTr += '	<td style="text-align: center;">'+isEmpty(el.character_maximum_length)+'</td>';
@@ -240,8 +244,9 @@ const agentRecvLocalCol = function(table_nm){
 	  	    });
 			  	    
  	    	$("#agentRecvLocalCol").html(insertTr);
- 	    	
+	
 	  	  }
+	  
 	  	
     }).fail(function (error) {
         alert(JSON.stringify(error));
@@ -295,7 +300,7 @@ const receiveCol = function(column_names, clct_csv_file, trf_zip_file){
 	let insertTr = '';
 	for (var i = 0; i <jbSplit.length;i++) {
 		insertTr += '<tr id="tr'+isEmpty(jbSplit[i])+'">';
-		insertTr += '	<td style="text-align: left;cursor:pointer;" onclick=leftSet("'+isEmpty(jbSplit[i])+'");><span id="'+isEmpty(jbSplit[i])+'">'+isEmpty(jbSplit[i])+'</span></td>';
+		insertTr += '	<td style="text-align: left;cursor:pointer;" ><span draggable="true" ondragstart="drag(event)" id="'+isEmpty(jbSplit[i])+'">'+isEmpty(jbSplit[i])+'</span></td>';
 		insertTr += '</tr>';
     }
  	$("#receiveCol").html(insertTr);
@@ -342,33 +347,18 @@ const agentRecvLocalCsvList = function(){
     });	
 }
 
-const leftSet = function(val){
-	$("#leftVal").val(val);
+
+const allowDrop = function(allowdropevent) {
+    allowdropevent.preventDefault();
 }
 
-const rightSet = function(val){
-	$("#rightVal").val(val);
+const drag = function(dragevent) {
+    dragevent.dataTransfer.setData("text", dragevent.target.id);
 }
 
-const leftSetBtn = function(){
- 	$("#tr"+$("#"+$("#rightVal").val()).text()).show();
- 	$("#"+$("#rightVal").val()).text("");
- 	
- 	$("#leftVal").val("");
- 	$("#rightVal").val("");
+const drop= function(dropevent) {
+    dropevent.preventDefault();
+    var data = dropevent.dataTransfer.getData("text");
+    dropevent.target.appendChild(document.getElementById(data));
 }
-
-const rightSetBtn = function(){
-	
-	if($("#rightVal").val() == ""){
-		alert("컬럼 매핑 할곳을 선택해주세요!");
-		return;
-	}
-	$("#"+$("#rightVal").val()).text($("#leftVal").val());
-	$("#tr"+$("#leftVal").val()).hide();
-	
-	$("#leftVal").val("");
-	$("#rightVal").val("");
-}
-
 </script>
