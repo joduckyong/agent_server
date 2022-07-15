@@ -274,9 +274,9 @@ const agentRecvLocalTable = function(){
 	  	  if (data != null) {
  	    	
  	    	let insertTr = '';
-	  	    $.each(data, function (idx, el) {
+	  	    $.each(data.tbl_list, function (idx, el) {
 				insertTr += '<tr>';
-				insertTr += '	<td style="text-align: left;cursor:pointer;" onclick=agentRecvLocalCol("'+el+'");>'+isEmpty(el)+'</td>';
+				insertTr += '	<td style="text-align: left;cursor:pointer;" onclick=agentRecvLocalCol("'+el.tbl_nm+'");>'+isEmpty(el.tbl_nm)+'</td>';
 				insertTr += '</tr>';
 	  	    });
 			  	    
@@ -331,9 +331,9 @@ const agentRecvLocalCsvList = function(){
  	    	let i = 0;
 	  	    $.each(data, function (idx, el) {
 				insertTr += '<tr>';
-				insertTr += '	<td style="text-align: center;">'+isEmpty(el.local_gov_nm)+'</td>';
+				insertTr += '	<td style="text-align: center;">'+isEmpty(el.code_nm)+'</td>';
 				insertTr += '	<td style="text-align: center;">'+el.recv_datetime+'</td>';
-				insertTr += '	<td style="text-align: center;cursor:pointer;" onclick=receiveCol("column_name_'+(++i)+'","'+el.clct_csv_file+'","'+el.trf_zip_file+'");>'+el.clct_csv_file.substring(16)+'<input type=hidden name=column_name_'+(i)+' id=column_name_'+(i)+' value="'+el.column_name+'"></td>';
+				insertTr += '	<td style="text-align: center;cursor:pointer;" onclick=receiveCol("column_name_'+(++i)+'","'+el.clct_csv_file+'","'+el.recv_zip_file+'");>'+el.clct_csv_file.substring(16)+'<input type=hidden name=column_name_'+(i)+' id=column_name_'+(i)+' value="'+el.column_name+'"></td>';
 				insertTr += '	<td style="text-align: center;">'+el.file_size+'</td>';
 				insertTr += '</tr>';
 	  	    });
