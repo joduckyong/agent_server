@@ -32,6 +32,7 @@
                         <tr> 
                           <th>no.</th>
                           <th>지자체명</th>
+                          <th>지자체코드</th>
                           <th>수신일자</th>
                           <th>수신파일목록</th>
                           <th>수신파일(개수)</th>
@@ -63,12 +64,15 @@
                   <div class="table_responsive" style="height: 300px; overflow: auto">
                     <table class="table table-striped">
                       <colgroup> 
-                        <col width="55px">
+                        <col width="15%">
+                        <col width="60%">
+                        <col width="25%">
                       </colgroup>
                       <thead>
                         <tr> 
                           <th>no.</th>
                           <th>파일명</th>
+                          <th>데이터 수집(개수)</th>
                         </tr>
                       </thead>
                       <tbody id="csvList">
@@ -130,14 +134,15 @@ const agentRecvZipList = function(page, size_per_page){
  	    	if(data.content != ""){
 	 	    	console.log(data);
 		  	    $.each(data.content, function (idx, el) {
-		  	    	let file_name = el.trf_zip_file;
+		  	    	let file_name = el.recv_zip_file;
 		  	    	let transmission_date = file_name.substring(0,4) + '-' + file_name.substring(4,6) + '-' +file_name.substring(6,8) + ' ' + file_name.substring(9,11) + ':' + file_name.substring(11,13) + ':' + file_name.substring(13,15);
 					insertTr += '<tr>';
 					insertTr += '	<td>'+(idx+1)+'</td>';
-					insertTr += '	<td>'+isEmpty(el.local_gov_nm)+'</td>';
+					insertTr += '	<td>'+isEmpty(el.code_nm)+'</td>';
+					insertTr += '	<td>'+isEmpty(el.code)+'</td>';
 					insertTr += '	<td>'+transmission_date+'</td>';
 					insertTr += ' 	<td>';
-					insertTr += '		<ol><li><a class="btn btn-dark btn-sm mx-0" href="#" onclick="agentRecvCsvList(\''+el.trf_zip_file+'\');">파일목록</a></li></ol>';
+					insertTr += '		<ol><li><a class="btn btn-dark btn-sm mx-0" href="#" onclick="agentRecvCsvList(\''+el.recv_zip_file+'\');">파일목록</a></li></ol>';
 					insertTr += '	</td>';
 					insertTr += '	<td>'+el.clct_csv_file_num+'</td>';
 					insertTr += '</tr>';
@@ -183,6 +188,7 @@ const agentRecvCsvList = function(file_name){
 					insertTr += '<tr>';
 					insertTr += '	<td>'+el.no+'</td>';
 					insertTr += '	<td>'+el.clct_csv_file+'</td>';
+					insertTr += '	<td>'+isEmpty(el.clct_csv_row_num)+'</td>';
 					insertTr += '</tr>';
 		  	    });
 			  	    
