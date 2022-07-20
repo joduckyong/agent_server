@@ -16,10 +16,13 @@
 								</div>
 								<label class="control-label">수신파일 목록</label>
 								<div class="x_content">
-									<div class="table_responsive"
-										style="height: 185px; overflow: auto">
+									<div class="table_responsive" style="height: 185px; overflow: auto">
 										<table class="table table-striped" style="width: 100%">
 											<colgroup>
+												<col width="15px">
+												<col width="30px">
+												<col width="40px">
+												<col width="15px">
 											</colgroup>
 											<thead>
 												<tr>
@@ -46,14 +49,14 @@
 									</button>
 								</div>
 								<div class="x_content">
-									<div class="table_responsive"
-										style="height: 210px; overflow: auto">
+									<div class="table_responsive" style="height: 210px; overflow: auto">
 										<table class="table table-striped" style="width: 100%">
 											<colgroup>
 											</colgroup>
 											<thead>
 												<tr>
 													<th style="text-align: center;">테이블명</th>
+													<th style="text-align: center;">테이블 설명</th>
 												</tr>
 											</thead>
 											<tbody id="agentRecvLocalTable" >
@@ -131,6 +134,7 @@
 					<input type="hidden" name="table_nm" id="table_nm">
 					<input type="hidden" name="clct_csv_file" id=clct_csv_file>
 					<input type="hidden" name="trf_zip_file" id="trf_zip_file">
+					<input type="hidden" name="file_nm" id="file_nm">
 
 				</div>
 			</div>
@@ -189,8 +193,9 @@ const agentRecvData = function(){
 	   		table_nm: $("#table_nm").val(),
 	   		table_col_nm: table_col_nm,	
 	   		clct_csv_file: $("#clct_csv_file").val(),	
-	   		file_col_nm: file_col_nm,	
-	   		trf_zip_file: $("#trf_zip_file").val(), 		   		
+	   		recv_zip_file: $("#trf_zip_file").val(), 		
+	   		file_col_idx: file_col_nm_len,
+	   		file_nm:  $("#file_nm").val(), 
 	    };	
 		
 	    $.ajax({
@@ -277,6 +282,7 @@ const agentRecvLocalTable = function(){
 	  	    $.each(data.tbl_list, function (idx, el) {
 				insertTr += '<tr>';
 				insertTr += '	<td style="text-align: left;cursor:pointer;" onclick=agentRecvLocalCol("'+el.tbl_nm+'");>'+isEmpty(el.tbl_nm)+'</td>';
+				insertTr += '	<td style="text-align: left;cursor:pointer;" >'+isEmpty(el.tbl_desc)+'</td>';
 				insertTr += '</tr>';
 	  	    });
 			  	    
@@ -289,11 +295,23 @@ const agentRecvLocalTable = function(){
     });		
 }
 
-const receiveCol = function(column_names, clct_csv_file, trf_zip_file){
+const receiveCol = function(column_names, clct_csv_file, trf_zip_file, file_nm){
 	
 	$("#clct_csv_file").val(clct_csv_file);
 	$("#trf_zip_file").val(trf_zip_file);
+	$("#file_nm").val(file_nm);
 	
+	let column_name = $("#"+column_names).val();
+	
+	let insertTr = '';
+    $.each(column_name, function (idx, el) {
+		insertTr += '<tr id="tr'+isEmpty(el.file_col_nm)+'">';
+		insertTr += '	<td style="text-align: left;cursor:pointer;" ><span draggable="true" ondragstart="drag(event)" id="'+isEmpty(el.file_col_nm)+'">'+isEmpty(el.file_col_nm)+'</span></td>';
+		insertTr += '</tr>';
+    });
+    $("#receiveCol").html(insertTr);
+    
+	/*
 	let column_name = $("#"+column_names).val().replace('[', '').replace(']', '').replace(/ /g,"");
     var jbSplit = column_name.split(',');
 
@@ -304,7 +322,7 @@ const receiveCol = function(column_names, clct_csv_file, trf_zip_file){
 		insertTr += '</tr>';
     }
  	$("#receiveCol").html(insertTr);
- 	
+ 	*/
 }
 
 //지자체별 csv파일 조회
@@ -332,9 +350,9 @@ const agentRecvLocalCsvList = function(){
 	  	    $.each(data, function (idx, el) {
 				insertTr += '<tr>';
 				insertTr += '	<td style="text-align: center;">'+isEmpty(el.code_nm)+'</td>';
-				insertTr += '	<td style="text-align: center;">'+el.recv_datetime+'</td>';
-				insertTr += '	<td style="text-align: center;cursor:pointer;" onclick=receiveCol("column_name_'+(++i)+'","'+el.clct_csv_file+'","'+el.recv_zip_file+'");>'+el.clct_csv_file.substring(16)+'<input type=hidden name=column_name_'+(i)+' id=column_name_'+(i)+' value="'+el.column_name+'"></td>';
-				insertTr += '	<td style="text-align: center;">'+el.file_size+'</td>';
+				insertTr += '	<td style="text-align: center;">'+isEmpty(el.recv_datetime)+'</td>';
+				insertTr += '	<td style="text-align: center;cursor:pointer;" onclick=receiveCol("column_name_'+(++i)+'","'+el.clct_csv_file+'","'+el.recv_zip_file+'","'+el.file_nm+'");>'+isEmpty(el.file_nm)+'<input type=hidden name=column_name_'+(i)+' id=column_name_'+(i)+' value="'+el.col_info+'"></td>';
+				insertTr += '	<td style="text-align: center;">'+isEmpty(el.clct_csv_file_size)+'</td>';
 				insertTr += '</tr>';
 	  	    });
 			  	    
